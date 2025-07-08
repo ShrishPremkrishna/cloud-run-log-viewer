@@ -8,6 +8,38 @@ PROJECT_ID=${GCP_PROJECT_ID:-"striking-lane-458100-j4"}
 SERVICE_NAME="cloud-run-log-viewer"
 REGION="us-central1"
 
+# Function to check if user is authenticated
+check_auth() {
+    echo "🔐 Checking Google Cloud authentication..."
+    if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q .; then
+        echo "❌ Not authenticated with Google Cloud. Please run: gcloud auth login"
+        exit 1
+    fi
+    echo "✅ Authentication verified"
+}
+
+# Function to configure Docker for GCR
+configure_docker() {
+    echo "🐳 Configuring Docker for Google Container Registry..."
+    gcloud auth configure-docker --quiet
+    echo "✅ Docker configured for GCR"
+}
+
+# Function to verify project access
+verify_project() {
+    echo "📋 Verifying project access..."
+    if ! gcloud projects describe $PROJECT_ID >/dev/null 2>&1; then
+        echo "❌ Cannot access project $PROJECT_ID. Please check your permissions."
+        exit 1
+    fi
+    echo "✅ Project access verified"
+}
+
+# Pre-deployment checks
+check_auth
+configure_docker
+verify_project
+
 # Create and use buildx builder if not already present
 if ! docker buildx inspect cloudrunbuilder &>/dev/null; then
   docker buildx create --use --name cloudrunbuilder
@@ -18,7 +50,6 @@ fi
 echo "🚀 Deploying to Google Cloud Run..."
 
 # Build and push the Docker image for linux/amd64
-
 echo "📦 Building and pushing Docker image for linux/amd64..."
 docker buildx build --platform linux/amd64 -t gcr.io/$PROJECT_ID/$SERVICE_NAME:latest --push .
 
