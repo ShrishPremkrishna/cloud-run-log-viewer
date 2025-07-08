@@ -3,10 +3,27 @@
 # Exit on any error
 set -e
 
+# --- Environment Configuration ---
+# Default environment is 'production'. Pass 'staging' as the first argument
+# for a staging deployment. Example: ./deploy.sh staging
+ENV=${1:-production}
+
 # Configuration
 PROJECT_ID=${GCP_PROJECT_ID:-"striking-lane-458100-j4"}
-SERVICE_NAME="cloud-run-log-viewer"
+BASE_SERVICE_NAME="cloud-run-log-viewer"
 REGION="us-central1"
+
+if [ "$ENV" == "production" ]; then
+    SERVICE_NAME=$BASE_SERVICE_NAME
+elif [ "$ENV" == "staging" ]; then
+    SERVICE_NAME="${BASE_SERVICE_NAME}-staging"
+else
+    echo "❌ Invalid environment specified. Use 'staging' or 'production'."
+    exit 1
+fi
+
+echo "🚀 Deploying environment '$ENV' to service '$SERVICE_NAME'..."
+# --- End Environment Configuration ---
 
 # Function to check if user is authenticated
 check_auth() {

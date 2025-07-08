@@ -1,6 +1,29 @@
 # Deployment Guide
 
-This guide covers two deployment options for demoing your cloud-run-log-viewer to your team.
+This guide covers deployment options for demoing and testing your cloud-run-log-viewer.
+
+## Testing Workflow
+
+1.  **Local Development (for rapid iteration):**
+    - Run `npm run dev` to start the local server with hot-reloading.
+    - This is the fastest way to see UI changes as you code.
+
+2.  **Staging Deployment (for realistic testing):**
+    - Deploy to a separate, production-like environment on Cloud Run.
+    - Use this to test end-to-end functionality and share for feedback.
+    - Run the command:
+      ```bash
+      ./deploy.sh staging
+      ```
+
+3.  **Production Deployment:**
+    - Once testing is complete, deploy to your main application.
+    - Run the command:
+      ```bash
+      ./deploy.sh production
+      # Or simply:
+      # ./deploy.sh
+      ```
 
 ## Option 1: Quick Demo with ngrok (Recommended for immediate demos)
 
